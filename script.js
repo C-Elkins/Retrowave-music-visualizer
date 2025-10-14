@@ -1258,17 +1258,28 @@ openYoutubeBtn.addEventListener('click', () => {
   }
 });
 
-// Extract YouTube video ID from various URL forms
+// Extract and sanitize YouTube video ID from various URL forms
 function extractYouTubeId(url) {
   try {
     const u = new URL(url);
-    if (u.hostname.includes('youtu.be')) {
-      return u.pathname.slice(1);
+    // Only allow youtube.com and youtu.be domains for security
+    if (!u.hostname.match(/^(www\.)?(youtube\.com|youtu\.be)$/)) {
+      return '';
     }
-    if (u.searchParams.get('v')) return u.searchParams.get('v');
-    // Shorts or embed
-    const m = u.pathname.match(/\/shorts\/([\w-]+)/) || u.pathname.match(/\/embed\/([\w-]+)/);
-    if (m) return m[1];
+    let id = '';
+    if (u.hostname.includes('youtu.be')) {
+      id = u.pathname.slice(1);
+    } else if (u.searchParams.get('v')) {
+      id = u.searchParams.get('v');
+    } else {
+      // Shorts or embed
+      const m = u.pathname.match(/\/shorts\/([\w-]+)/) || u.pathname.match(/\/embed\/([\w-]+)/);
+      if (m) id = m[1];
+    }
+    // Sanitize: YouTube IDs are 11 chars, alphanumeric + _ and -
+    if (id && /^[\w-]{11}$/.test(id)) {
+      return id;
+    }
   } catch {}
   return '';
 }

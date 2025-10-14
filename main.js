@@ -580,14 +580,27 @@ openYoutubeBtn.addEventListener('click', () => {
   try { const u = new URL(url); if (!/youtube\.com|youtu\.be/.test(u.hostname)) { if (!confirm('This URL does not appear to be a YouTube link. Open anyway?')) return; } window.open(u.toString(), '_blank'); } catch { alert('Please enter a valid URL (e.g. https://www.youtube.com/watch?v=...)'); }
 });
 
-// Extract YouTube ID
+// Extract and sanitize YouTube video ID
 function extractYouTubeId(url) {
   try {
     const u = new URL(url);
-    if (u.hostname.includes('youtu.be')) return u.pathname.slice(1);
-    if (u.searchParams.get('v')) return u.searchParams.get('v');
-    const m = u.pathname.match(/\/shorts\/([\w-]+)/) || u.pathname.match(/\/embed\/([\w-]+)/);
-    if (m) return m[1];
+    // Only allow youtube.com and youtu.be domains for security
+    if (!u.hostname.match(/^(www\.)?(youtube\.com|youtu\.be)$/)) {
+      return '';
+    }
+    let id = '';
+    if (u.hostname.includes('youtu.be')) {
+      id = u.pathname.slice(1);
+    } else if (u.searchParams.get('v')) {
+      id = u.searchParams.get('v');
+    } else {
+      const m = u.pathname.match(/\/shorts\/([\w-]+)/) || u.pathname.match(/\/embed\/([\w-]+)/);
+      if (m) id = m[1];
+    }
+    // Sanitize: YouTube IDs are 11 chars, alphanumeric + _ and -
+    if (id && /^[\w-]{11}$/.test(id)) {
+      return id;
+    }
   } catch {}
   return '';
 }
