@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>augmented-ui social media picture-of-code thing</title>
+    <link rel='stylesheet' href='https://unpkg.com/augmented-ui@2.0.0/augmented-ui.min.css'>
+<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.35.0/codemirror.css'>
+<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.1/addon/scroll/simplescrollbars.min.css'><link rel="stylesheet" href="./style.css">
+
+  </head>
+    
+  <body>
+  <code class="code-container">
+  <input class="sig" value="// Jane 💜">
+  <div class="glow-container">
+    <div class="augs" data-augmented-ui></div>
+  </div>
+  <section class="augs bg" data-augmented-ui>
+    <button class="dots" onclick="changeMode(this)" title="(click to change) Current Mode: css"></button>
+    <input class="title" value="propjockey.io">
+    <div class="code highcontrast-dark">
+      <textarea id="code">
+@keyframes cast-bit-to-space-toggle {
+  to { --space-toggle: ; }
+}
+
+:where(.cbtst) {
+  --cbtst-animation: cast-bit-to-space-toggle
+    1ms linear both var(--bit, 0);
+  animation: var(--cbtst-animation);
+}
+
+/* usage */
+.my-el.cbtst {
+  --bit: 1; /* provide input value of 0 or 1 */
+  /* var(--space-toggle) is the output */
+  
+  --bg: var(--space-toggle) lime;
+  background: var(--bg, red);
+  /* 1 = lime, 0 = red */
+}
+      </textarea>
+    </div>
+  </section>
+</div>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.1/codemirror.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.1/mode/javascript/javascript.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.1/mode/css/css.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.1/addon/scroll/simplescrollbars.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.1/mode/markdown/markdown.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.1/mode/htmlmixed/htmlmixed.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.1/mode/xml/xml.js'></script><script  src="./script.js"></script>
+
+  </body>
+  
+</html>

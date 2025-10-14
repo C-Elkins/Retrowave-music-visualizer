@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>404 • Lost in the Neon Night</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg:#060012; --text:#e6d6ff; --a1:#ff2d92; --a2:#00e5ff; --a3:#9d4edd; }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0; background: radial-gradient(1200px 600px at 50% 100%, rgba(255,255,255,0.06), transparent 60%), var(--bg); color:var(--text); font-family:"Orbitron",system-ui,-apple-system,Segoe UI,Roboto,Arial; overflow:hidden}
+    .crt{position:fixed; inset:0; pointer-events:none; opacity:.12; background: repeating-linear-gradient(to bottom, rgba(255,255,255,.15) 0, rgba(255,255,255,.15) 1px, transparent 2px, transparent 4px); mix-blend-mode:overlay}
+    .wrap{position:relative; height:100%; display:grid; place-items:center}
+    .card{position:relative; text-align:center; padding:28px 28px 40px; border:1px solid rgba(255,255,255,.15); border-radius:16px; background:rgba(0,0,0,.35); box-shadow:0 10px 28px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.06) inset}
+    .title{font-family:"Press Start 2P", monospace; font-size:28px; color:var(--a2); text-shadow:0 0 12px var(--a2)}
+    .subtitle{margin-top:10px; font-size:14px; opacity:.9}
+    .grid{position:absolute; left:0; right:0; bottom:-1px; height:48vh; background:linear-gradient(0deg, rgba(0,0,0,.8), rgba(0,0,0,0)); border-bottom-left-radius:16px; border-bottom-right-radius:16px; overflow:hidden}
+    .grid canvas{position:absolute; inset:0; width:100%; height:100%}
+    .btn{margin-top:18px; display:inline-block; padding:10px 16px; border-radius:10px; border:1px solid rgba(255,255,255,.18); background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); color:var(--text); text-decoration:none; box-shadow:0 0 0 1px rgba(255,255,255,.06) inset}
+    .btn:hover{box-shadow:0 0 12px var(--a2), 0 0 24px var(--a2) inset}
+  </style>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const canvas = document.getElementById('c');
+      const ctx = canvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+      function resize(){ const w = canvas.clientWidth, h = canvas.clientHeight; canvas.width=w*dpr; canvas.height=h*dpr; ctx.setTransform(dpr,0,0,dpr,0,0); draw(); }
+      window.addEventListener('resize', resize); resize();
+      function draw(){ const w=canvas.clientWidth, h=canvas.clientHeight; ctx.clearRect(0,0,w,h); const horizon = h*0.2; // sun
+        const r = Math.min(w,h)*0.1; const y = horizon; const g = ctx.createRadialGradient(w/2,y,0,w/2,y,r); g.addColorStop(0,'#ff2d92cc'); g.addColorStop(1,'#ff2d9200'); ctx.globalCompositeOperation='screen'; ctx.fillStyle=g; ctx.beginPath(); ctx.arc(w/2,y,r,0,Math.PI*2); ctx.fill(); ctx.globalCompositeOperation='source-over';
+        // stripes
+        ctx.fillStyle = '#ff2d9288'; for(let i=0;i<7;i++){ const yy = y - r*0.7 + i*(r*0.22); ctx.fillRect(w/2-r, yy, r*2, r*0.06); }
+        // grid
+        ctx.strokeStyle = 'rgba(255,45,146,0.35)'; for(let i=0;i<24;i++){ const p=i/24; const gy = (horizon+10) + Math.pow(p,2.2)*(h-horizon); ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(w,gy); ctx.stroke(); }
+        const vpX = w/2; for(let x=-w; x<2*w; x+=60){ ctx.beginPath(); ctx.moveTo(x,h); ctx.lineTo(vpX,horizon); ctx.stroke(); }
+      }
+    });
+  </script>
+  <meta name="robots" content="noindex" />
+  <link rel="canonical" href="/" />
+  <meta http-equiv="refresh" content="60; url=/" />
+  </head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="title">404</div>
+      <div class="subtitle">You drifted off the neon highway.</div>
+      <a class="btn" href="./">Back to Visualizer</a>
+      <div class="grid"><canvas id="c"></canvas></div>
+    </div>
+  </div>
+  <div class="crt"></div>
+</body>
+</html>

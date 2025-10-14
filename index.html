@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RetroWave Music Visualizer</title>
+  <meta name="description" content="Interactive RetroWave/Synthwave music visualizer with neon aesthetics and real-time audio analysis." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <!-- Augmented UI for code editor mode -->
+  <link rel="stylesheet" href="https://unpkg.com/augmented-ui@2/augmented-ui.min.css">
+  <!-- CodeMirror for code editor mode -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/scroll/simplescrollbars.min.css">
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="assets/favicon-80s-sunset.svg" type="image/svg+xml" />
+</head>
+<body>
+  <div id="app" class="theme-sunset">
+    <div class="crt-overlay"></div>
+
+    <header class="top-bar">
+      <div class="logo">RETROWAVE<span>VISUALIZER</span></div>
+      <div id="nowPlaying" class="now-playing">Now Playing: —</div>
+      <div class="spacer"></div>
+      <div id="muteIndicator" class="pill pill-muted" hidden>Muted</div>
+  <button id="fullscreenBtn" class="icon-btn" title="Fullscreen" aria-label="Fullscreen">⛶<span class="btn-label">Full</span></button>
+    </header>
+
+    <main class="main">
+      <canvas id="canvas"></canvas>
+      <div id="hud" class="hud" aria-hidden="true"></div>
+
+      <div class="controls">
+        <div class="row main-controls">
+          <label for="fileInput" class="file-label icon-btn" title="Upload Audio" aria-label="Upload Audio">📁<span class="btn-label">Upload</span></label>
+          <input id="fileInput" type="file" accept="audio/*" />
+
+          <button id="radioBtn" class="icon-btn" title="📻 Radio - Click to play | Right-click to change station (Nightride FM/Chillsynth/Datawave)" aria-label="Toggle 80s Radio">📻<span class="btn-label">Radio</span></button>
+
+          <button id="playPauseBtn" class="icon-btn" title="Play/Pause" aria-label="Play or Pause"><span class="btn-label">Play</span></button>
+          <button id="stopBtn" class="icon-btn" title="Stop" aria-label="Stop"><span class="btn-label">Stop</span></button>
+
+          <div class="volume">
+            <button id="muteBtn" class="icon-btn" title="Mute/Unmute" aria-label="Mute or Unmute">🔊<span class="btn-label">Mute</span></button>
+            <input id="volumeSlider" type="range" min="0" max="1" step="0.01" value="0.8" />
+          </div>
+
+          <select id="modeSelect" class="select">
+            <option value="bars">Spectrum Rings</option>
+            <option value="particles">Particle Waves</option>
+            <option value="grid">Retrowave Grid</option>
+            <option value="neonTunnel" selected>Neon Tunnel</option>
+          </select>
+
+          <select id="themeSelect" class="select">
+            <option value="sunset">Sunset</option>
+            <option value="night">Night</option>
+            <option value="neon">Neon</option>
+          </select>
+
+          <button id="crtToggleBtn" class="icon-btn" title="Toggle CRT Effects (Scanlines, Curvature, Glitches)" aria-label="Toggle CRT Effects">📺<span class="btn-label">CRT</span></button>
+          <button id="toggleAdvancedBtn" class="icon-btn" title="Show Advanced Controls" aria-label="Toggle Advanced Controls">⚙️<span class="btn-label">Settings</span></button>
+        </div>
+
+        <!-- Collapsible Advanced Controls -->
+        <div id="advancedControls" class="advanced-controls">
+          <div class="row">
+          <button id="micBtn" class="icon-btn" title="Capture Microphone" aria-label="Capture Microphone">🎤<span class="btn-label">Mic</span></button>
+          <button id="tabBtn" class="icon-btn" title="Capture Tab/Window Audio" aria-label="Capture Tab or Window Audio">🖥️<span class="btn-label">Tab</span></button>
+          <button id="captureStopBtn" class="icon-btn" title="Stop Capture" aria-label="Stop Capture">⏹️<span class="btn-label">Stop</span></button>
+          <button id="captureHelpBtn" class="icon-btn" title="System Audio Help" aria-label="System Audio Help">❓<span class="btn-label">Help</span></button>
+
+          <select id="qualitySelect" class="select" title="Render Quality">
+            <option value="auto" selected>Auto Quality</option>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
+
+        <div class="row sliders">
+          <label class="slider">
+            <span>Sensitivity</span>
+            <input id="sensitivity" type="range" min="0.2" max="3" step="0.1" value="1.0" />
+          </label>
+          <label class="slider">
+            <span>Intensity</span>
+            <input id="intensity" type="range" min="0.5" max="2.5" step="0.1" value="0.9" />
+          </label>
+          <label class="slider">
+            <span>Smoothing</span>
+            <input id="smoothing" type="range" min="0" max="0.95" step="0.01" value="0.65" />
+          </label>
+        </div>
+        
+        <div class="row">
+          <input id="youtubeUrl" class="text-input" type="url" placeholder="Paste YouTube link…" aria-label="YouTube URL" />
+          <button id="openYoutubeBtn" class="icon-btn" title="Open YouTube link in new tab" aria-label="Open YouTube link">🔗<span class="btn-label">Open</span></button>
+          <button id="dockYoutubeBtn" class="icon-btn" title="Open YouTube in docked player" aria-label="Dock YouTube">📌<span class="btn-label">Dock</span></button>
+          <button id="quickDockBtn" class="icon-btn" title="Dock + Capture This Tab (easiest for YouTube)" aria-label="Quick Dock and Capture">⚡<span class="btn-label">Quick</span></button>
+        </div>
+
+        <div class="row">
+          <select id="inputDeviceSelect" class="select" title="Input Device (Mic/Loopback)">
+            <option value="">Input: Default</option>
+          </select>
+          <button id="refreshDevicesBtn" class="icon-btn" title="Refresh devices" aria-label="Refresh devices">🔄<span class="btn-label">Refresh</span></button>
+          <button id="monitorBtn" class="icon-btn" title="Monitor captured audio (off)" aria-label="Monitor captured audio">👂<span class="btn-label">Monitor</span></button>
+        </div>
+      </div>
+
+
+        <!-- Docked YouTube Player -->
+        <div id="ytDock" class="yt-dock" hidden>
+          <div class="yt-header">
+            <div class="yt-title">YouTube Player (Docked)</div>
+            <div class="yt-actions">
+              <button id="ytUnmuteBtn" class="icon-btn small" title="Unmute player" aria-label="Unmute">🔊<span class="btn-label">Unmute</span></button>
+              <button id="captureThisTabBtn" class="icon-btn small" title="Capture This Tab's Audio" aria-label="Capture This Tab">🎵<span class="btn-label">Capture</span></button>
+              <button id="ytCloseBtn" class="icon-btn small" title="Close Dock" aria-label="Close Dock">✖️<span class="btn-label">Close</span></button>
+            </div>
+          </div>
+          <div class="yt-body">
+            <div class="yt-aspect">
+              <iframe id="ytFrame" src="" title="YouTube player" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <div class="hint">Press Play in the player if needed. Then click “Capture” and choose <b>This Tab</b> with <b>Share tab audio</b> enabled.</div>
+          </div>
+        </div>
+
+        
+
+        <div class="row help">
+          <div>Shortcuts: 1 Spectrum Rings • 2 Particle Waves • 3 Retrowave Grid • 4 Neon Tunnel • G Grid Toggle • F Fullscreen • M Mute</div>
+          <div style="margin-top: 8px; font-size: 0.85em; opacity: 0.7;">Radio powered by <a href="https://nightride.fm" target="_blank" rel="noopener" style="color: #ff2d92; text-decoration: none;">Nightride.fm</a> - Premium Synthwave Streaming</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <audio id="audio" crossorigin="anonymous"></audio>
+  <audio id="radioAudio" crossorigin="anonymous" preload="none"></audio>
+
+  <!-- System Audio Help Modal -->
+  <div id="helpModal" class="modal" hidden>
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Capture System/Tab Audio</div>
+        <button id="helpCloseBtn" class="icon-btn small" title="Close" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>To visualize audio from YouTube or other tabs:</p>
+        <ol>
+          <li>Open your YouTube link in a separate tab (use the YouTube button here, or paste it manually).</li>
+          <li>Start playback in that tab.</li>
+          <li>Return here and click <b>Capture Tab/Window Audio</b>.</li>
+          <li>In the picker, select your YouTube tab and ensure <b>Share tab audio</b> is enabled.</li>
+        </ol>
+        <p><b>Browser notes</b>:</p>
+        <ul>
+          <li><b>Chrome/Edge/Brave</b>: Tab/Window capture with audio is supported. Use Share tab audio.</li>
+          <li><b>Firefox</b>: Limited support; mic capture works. Tab audio capture may be unavailable.</li>
+          <li><b>Safari</b>: System audio capture is limited; mic capture works. You must interact to start audio.</li>
+        </ul>
+        <p><b>Choppy audio?</b></p>
+        <ul>
+          <li>Lower quality: set the <b>Quality</b> dropdown to Medium/Low.</li>
+          <li>Close other heavy tabs or apps. Disable other capture sessions.</li>
+          <li>Prefer capturing a single tab, not the whole screen.</li>
+        </ul>
+      </div>
+      <div class="modal-footer" style="display:flex;justify-content:flex-end;padding:10px 14px;border-top:1px solid rgba(255,255,255,0.12)">
+        <button id="tryAgainCaptureBtn" class="icon-btn small" title="Open capture picker again" aria-label="Try Again">🎵<span class="btn-label">Capture</span></button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Code Editor Container (hidden by default) -->
+  <div id="codeEditorContainer" class="code-editor-container" style="display: none;">
+    <code class="code-container-frame">
+      <input class="sig" value="// RetroWave Visualizer 💜" readonly>
+      <div class="glow-container">
+        <div class="augs" data-augmented-ui></div>
+      </div>
+      <section class="augs bg" data-augmented-ui>
+        <button class="dots" id="editorModeBtn" title="(click to change) Current Mode: javascript"></button>
+        <input class="title" value="retrowave-visualizer.js" readonly>
+        <div class="code highcontrast-dark">
+          <textarea id="codeTextArea">
+// 🌅 RetroWave Music Visualizer 🌆
+// Real-time audio-reactive canvas animations
+
+const visualizer = {
+  mode: 'neonTunnel',
+  theme: 'sunset',
+  
+  draw(ctx, audioData, time) {
+    // Your creative code here!
+    const { width, height } = ctx.canvas;
+    
+    // Audio reactivity
+    const bass = audioData.bass;
+    const mids = audioData.mids;
+    const highs = audioData.highs;
+    
+    // Draw something awesome...
+    ctx.fillStyle = \`hsl(\${time * 0.1 % 360}, 70%, 50%)\`;
+    ctx.fillRect(0, 0, width, height);
+  }
+};
+
+// Start creating your own visualizer effects!
+          </textarea>
+        </div>
+      </section>
+    </code>
+  </div>
+  
+  <!-- CodeMirror Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/css/css.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/markdown/markdown.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/htmlmixed/htmlmixed.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/xml/xml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/scroll/simplescrollbars.min.js"></script>
+  
+  <script src="script.js"></script>
+</body>
+</html>
