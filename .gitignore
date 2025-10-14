@@ -20,7 +20,8 @@ __pycache__/
 Thumbs.db
 
 # Build outputs
-adventure-game/dist/
+# Note: adventure-game/dist/bundle.js is needed for GitHub Pages
+# so we don't ignore it
 *.log
 
 # Temporary files
