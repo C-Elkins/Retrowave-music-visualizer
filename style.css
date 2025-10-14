@@ -286,33 +286,33 @@ input[type="file"] { display: none; }
   inset: 0;
   /* Subtle scanlines - just enough to see but not block text */
   background:
-    /* Light scanlines every 3px */
+    /* Light scanlines every 4px - less dense = better performance */
     repeating-linear-gradient(
       to bottom,
-      rgba(0,0,0,0.15) 0px,
-      rgba(0,0,0,0.15) 1px,
+      rgba(0,0,0,0.08) 0px,
+      rgba(0,0,0,0.08) 1px,
       transparent 1px,
-      transparent 3px
+      transparent 4px
     );
-  animation: scanline 8s linear infinite;
-  opacity: 0.7;
+  /* Removed animation - static scanlines perform better */
+  opacity: 0.6;
   z-index: 2;
-  /* Subtle phosphor glow */
-  box-shadow:
-    inset 0 0 100px rgba(0, 255, 200, 0.04),
-    inset 0 0 50px rgba(255, 0, 150, 0.03);
+  /* Removed box-shadow for performance */
+  will-change: opacity;
 }
 
 .crt-overlay::after {
   content: '';
   position: absolute;
   inset: 0;
-  /* Subtle film grain like Nightride.fm - light texture, not overwhelming */
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.15'/%3E%3C/svg%3E");
-  opacity: 0.35;
-  animation: noise 0.2s steps(8) infinite;
+  /* Simplified noise - lighter and less frequent animation */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
+  opacity: 0.25;
+  /* Slower animation - 1s instead of 0.2s */
+  animation: noise 1s steps(4) infinite;
   mix-blend-mode: soft-light;
   z-index: 1;
+  will-change: transform;
 }
 
 /* Additional CRT effects */
@@ -343,36 +343,25 @@ input[type="file"] { display: none; }
   inset: 0;
   z-index: 997;
   pointer-events: none;
-  /* CRT curvature shadow - more pronounced */
+  /* Simplified CRT curvature shadow - 2 layers instead of 5 */
   box-shadow:
-    inset 0 0 120px rgba(0,0,0,0.7),
     inset 0 0 80px rgba(0,0,0,0.5),
-    inset 0 0 40px rgba(0,0,0,0.3),
-    /* Subtle screen edge reflection */
-    inset 0 -5px 30px rgba(255,255,255,0.02),
-    inset 0 5px 30px rgba(255,255,255,0.01);
+    inset 0 0 40px rgba(0,0,0,0.3);
   border-radius: 8px;
   opacity: 1;
   transition: opacity 0.3s ease;
+  will-change: opacity;
 }
 
 #app.crt-disabled::after {
   opacity: 0;
 }
 
-/* CRT flicker animation */
+/* CRT flicker animation - optimized with fewer keyframes */
 @keyframes flicker {
-  0% { opacity: 0.98; }
-  2% { opacity: 1; }
-  4% { opacity: 0.97; }
-  8% { opacity: 0.99; }
-  10% { opacity: 1; }
-  12% { opacity: 0.98; }
-  14% { opacity: 0.99; }
-  16% { opacity: 1; }
-  18% { opacity: 0.97; }
-  20% { opacity: 0.99; }
-  100% { opacity: 1; }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.98; }
+  75% { opacity: 0.99; }
 }
 
 @keyframes scanline {
@@ -393,39 +382,26 @@ input[type="file"] { display: none; }
   90% { transform: translate(10%, 5%); }
 }
 
-/* Subtle CRT glow on text */
+/* Simplified CRT glow on text - 2 layers instead of 3 */
 .logo, .now-playing, .icon-btn[data-label]::after {
-  text-shadow: 
-    0 0 2px currentColor,
-    0 0 4px currentColor,
-    0 0 8px rgba(255,255,255,0.3);
+  text-shadow:
+    0 0 3px currentColor,
+    0 0 6px rgba(255,255,255,0.2);
 }
 
 /* Apply flicker to entire app */
 #canvas {
-  animation: flicker 4s infinite, rolling 3s linear infinite;
-  /* Subtle chromatic aberration - just a hint */
+  /* Reduced to single slower animation */
+  animation: flicker 8s infinite;
+  /* Simplified filter - removed drop-shadows (major performance hit) */
   filter:
-    drop-shadow(0.5px 0 0 rgba(255,0,0,0.15))
-    drop-shadow(-0.5px 0 0 rgba(0,255,255,0.15))
-    contrast(1.05)
-    brightness(1.02)
-    saturate(1.1);
-  /* Subtle glow - not overwhelming */
-  box-shadow:
-    0 0 20px rgba(255, 45, 146, 0.15),
-    0 0 40px rgba(109, 247, 255, 0.1);
-  /* Rolling scanline background - slower for less GPU load */
-  background:
-    linear-gradient(
-      to bottom,
-      transparent 0%,
-      transparent 49%,
-      rgba(255, 255, 255, 0.05) 50%,
-      transparent 51%,
-      transparent 100%
-    );
-  background-size: 100% 500px;
+    contrast(1.03)
+    brightness(1.01)
+    saturate(1.05);
+  /* Single subtle glow */
+  box-shadow: 0 0 30px rgba(255, 45, 146, 0.1);
+  will-change: filter, box-shadow;
+  /* Removed rolling scanline background for performance */
 }
 
 /* Disable flicker when CRT is off */
@@ -446,12 +422,13 @@ input[type="file"] { display: none; }
   95% { transform: translateX(0); }
 }
 
+/* Removed horizontalHold animation for performance */
 .main {
-  animation: horizontalHold 15s infinite;
+  /* No animation - static is more performant */
 }
 
 .crt-disabled .main {
-  animation: none;
+  /* No animation needed */
 }
 
 /* Rolling scanline effect - bright line that travels down the screen */
