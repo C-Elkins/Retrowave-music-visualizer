@@ -2,30 +2,115 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RetroWave Music Visualizer</title>
-  <meta name="description" content="Interactive RetroWave/Synthwave music visualizer with neon aesthetics and real-time audio analysis." />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>RetroWave Music Visualizer | Synthwave Audio Visualizer</title>
+  <meta name="description" content="Interactive RetroWave/Synthwave music visualizer with neon aesthetics, real-time audio analysis, 6 visualization modes, and 80s radio streaming." />
+  <meta name="keywords" content="retrowave, synthwave, music visualizer, audio visualizer, neon, 80s, vaporwave" />
+  <meta name="author" content="RetroWave Visualizer" />
+  <meta name="theme-color" content="#ff2d92" />
+  <meta property="og:title" content="RetroWave Music Visualizer" />
+  <meta property="og:description" content="Experience music like it's 1985 - Neon-soaked audio visualizations" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  
+  <!-- Critical CSS for loading screen (inline to prevent flash) -->
+  <style>
+    .loading-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      background: #0a0018;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+    }
+    .loading-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+    .loading-logo {
+      font-family: 'Press Start 2P', system-ui, monospace;
+      font-size: 24px;
+      color: #6df7ff;
+      text-shadow: 0 0 20px #6df7ff, 0 0 40px #6df7ff;
+      margin-bottom: 30px;
+      animation: loadingPulse 1.5s ease-in-out infinite;
+    }
+    .loading-logo span {
+      color: #ff2d92;
+    }
+    .loading-bar-container {
+      width: 280px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .loading-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ff2d92, #6df7ff);
+      border-radius: 3px;
+      transition: width 0.3s ease-out;
+      box-shadow: 0 0 10px #ff2d92;
+    }
+    .loading-text {
+      margin-top: 15px;
+      font-family: 'Orbitron', system-ui, sans-serif;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.6);
+    }
+    @keyframes loadingPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.02); }
+    }
+  </style>
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://stream.nightride.fm" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Press+Start+2P&display=swap" rel="stylesheet">
   <!-- Augmented UI for code editor mode -->
   <link rel="stylesheet" href="https://unpkg.com/augmented-ui@2/augmented-ui.min.css">
   <!-- CodeMirror for code editor mode -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/scroll/simplescrollbars.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/addon/scroll/simplescrollbars.min.css">
   <link rel="stylesheet" href="style.css" />
   <link rel="icon" href="assets/favicon-80s-sunset.svg" type="image/svg+xml" />
 </head>
 <body>
+  <!-- Loading Screen -->
+  <div id="loadingScreen" class="loading-screen">
+    <div class="loading-logo">RETROWAVE<span>VISUALIZER</span></div>
+    <div class="loading-bar-container">
+      <div id="loadingBar" class="loading-bar"></div>
+    </div>
+    <div class="loading-text">Initializing audio engine...</div>
+  </div>
+
   <div id="app" class="theme-sunset">
     <div class="crt-overlay"></div>
 
     <header class="top-bar">
-      <div class="logo">RETROWAVE<span>VISUALIZER</span></div>
-      <div id="nowPlaying" class="now-playing">Now Playing: —</div>
+      <div class="logo" role="banner">RETROWAVE<span>VISUALIZER</span></div>
+      <div id="nowPlaying" class="now-playing" aria-live="polite">Now Playing: —</div>
+      
+      <!-- VU Meter -->
+      <div id="vuMeter" class="vu-meter" aria-label="Audio Level Meter">
+        <div class="vu-bar" id="vuLeft"></div>
+        <div class="vu-bar" id="vuRight"></div>
+        <div class="vu-labels">
+          <span>L</span>
+          <span>R</span>
+        </div>
+      </div>
+      
       <div class="spacer"></div>
-      <div id="muteIndicator" class="pill pill-muted" hidden>Muted</div>
-  <button id="fullscreenBtn" class="icon-btn" title="Fullscreen" aria-label="Fullscreen">⛶<span class="btn-label">Full</span></button>
+      <div id="muteIndicator" class="pill pill-muted" hidden aria-live="polite">Muted</div>
+      <button id="fullscreenBtn" class="icon-btn" title="Fullscreen (F)" aria-label="Toggle Fullscreen">⛶<span class="btn-label">Full</span></button>
+      <button id="pipBtn" class="icon-btn" title="Picture-in-Picture" aria-label="Picture-in-Picture" hidden>📺<span class="btn-label">PiP</span></button>
     </header>
 
     <main class="main">
@@ -40,26 +125,46 @@
           <button id="radioBtn" class="icon-btn" title="📻 Radio - Click to play | Right-click to change station (Nightride FM/Chillsynth/Datawave)" aria-label="Toggle 80s Radio">📻<span class="btn-label">Radio</span></button>
 
           <button id="playPauseBtn" class="icon-btn" title="Play/Pause" aria-label="Play or Pause"><span class="btn-label">Play</span></button>
-          <button id="stopBtn" class="icon-btn" title="Stop" aria-label="Stop"><span class="btn-label">Stop</span></button>
+          <button id="stopBtn" class="icon-btn" title="Stop" aria-label="Stop">⏹<span class="btn-label">Stop</span></button>
+          
+          <!-- Time Display & Progress -->
+          <div class="time-display" id="timeDisplay">
+            <span id="currentTime">0:00</span>
+            <input type="range" id="progressBar" class="progress-bar" min="0" max="100" value="0" aria-label="Playback Progress" />
+            <span id="totalTime">0:00</span>
+          </div>
 
           <div class="volume">
             <button id="muteBtn" class="icon-btn" title="Mute/Unmute" aria-label="Mute or Unmute">🔊<span class="btn-label">Mute</span></button>
             <input id="volumeSlider" type="range" min="0" max="1" step="0.01" value="0.8" />
           </div>
 
-          <select id="modeSelect" class="select">
+          <select id="modeSelect" class="select" aria-label="Visualization Mode">
             <option value="bars">Spectrum Rings</option>
             <option value="particles">Particle Waves</option>
             <option value="grid">Retrowave Grid</option>
             <option value="neonTunnel" selected>Neon Tunnel</option>
+            <option value="waveform3d">Waveform 3D</option>
+            <option value="spectrum">Spectrum Analyzer</option>
           </select>
 
-          <select id="themeSelect" class="select">
-            <option value="sunset">Sunset</option>
-            <option value="night">Night</option>
-            <option value="neon">Neon</option>
+          <select id="presetSelect" class="select" aria-label="Audio Preset">
+            <option value="default">Default</option>
+            <option value="bass-boost">Bass Boost</option>
+            <option value="vocal">Vocal Focus</option>
+            <option value="electronic">Electronic</option>
+            <option value="chill">Chill</option>
           </select>
 
+          <select id="themeSelect" class="select" aria-label="Color Theme">
+            <option value="sunset">🌅 Sunset</option>
+            <option value="night">🌙 Night</option>
+            <option value="neon">💜 Neon</option>
+            <option value="miami">🌴 Miami</option>
+            <option value="cyber">🤖 Cyber</option>
+          </select>
+
+          <button id="nextThemeBtn" class="icon-btn" title="Next Theme (T key)" aria-label="Next Theme">🎨<span class="btn-label">Theme</span></button>
           <button id="crtToggleBtn" class="icon-btn" title="Toggle CRT Effects (Scanlines, Curvature, Glitches)" aria-label="Toggle CRT Effects">📺<span class="btn-label">CRT</span></button>
           <button id="toggleAdvancedBtn" class="icon-btn" title="Show Advanced Controls" aria-label="Toggle Advanced Controls">⚙️<span class="btn-label">Settings</span></button>
         </div>
@@ -133,8 +238,35 @@
         
 
         <div class="row help">
-          <div>Shortcuts: 1 Spectrum Rings • 2 Particle Waves • 3 Retrowave Grid • 4 Neon Tunnel • G Grid Toggle • F Fullscreen • M Mute</div>
-          <div style="margin-top: 8px; font-size: 0.85em; opacity: 0.7;">Radio powered by <a href="https://nightride.fm" target="_blank" rel="noopener" style="color: #ff2d92; text-decoration: none;">Nightride.fm</a> - Premium Synthwave Streaming</div>
+          <div class="shortcuts-info">
+            <strong>Shortcuts:</strong> 
+            <kbd>1</kbd>-<kbd>6</kbd> Modes
+            <span>•</span>
+            <kbd>T</kbd> Theme
+            <span>•</span>
+            <kbd>G</kbd> Game (Grid mode)
+            <span>•</span>
+            <kbd>F</kbd> Fullscreen
+            <span>•</span>
+            <kbd>M</kbd> Mute
+            <span>•</span>
+            <kbd>Space</kbd> Play/Pause
+            <span>•</span>
+            <kbd>R</kbd> Radio
+            <span>•</span>
+            <kbd>←</kbd><kbd>→</kbd> Seek
+          </div>
+          <div class="credits-row">
+            <span class="credits-item">
+              Radio by <a href="https://nightride.fm" target="_blank" rel="noopener" class="credit-link">Nightride.fm</a>
+            </span>
+            <span class="credits-item">
+              <span class="save-indicator">💾 Auto-save</span>
+            </span>
+            <span class="credits-item">
+              <span class="drag-hint">🎵 Drag & drop audio files</span>
+            </span>
+          </div>
         </div>
       </div>
     </main>
@@ -147,8 +279,8 @@
   <div id="helpModal" class="modal" hidden>
     <div class="modal-content">
       <div class="modal-header">
-        <div class="modal-title">Capture System/Tab Audio</div>
-        <button id="helpCloseBtn" class="icon-btn small" title="Close" aria-label="Close"></button>
+        <div class="modal-title">🎧 Capture System/Tab Audio</div>
+        <button id="helpCloseBtn" class="icon-btn small" title="Close" aria-label="Close">✕</button>
       </div>
       <div class="modal-body">
         <p>To visualize audio from YouTube or other tabs:</p>
@@ -179,6 +311,12 @@
   
   <!-- Code Editor Container (hidden by default) -->
   <div id="codeEditorContainer" class="code-editor-container" style="display: none;">
+    <!-- Close/Back Button -->
+    <button id="closeEditorBtn" class="editor-close-btn" title="Back to Visualizer (ESC)" aria-label="Close Editor">
+      <span class="close-icon">✕</span>
+      <span class="close-text">Back to Visualizer</span>
+    </button>
+    
     <code class="code-container-frame">
       <input class="sig" value="// RetroWave Visualizer 💜" readonly>
       <div class="glow-container">
@@ -218,28 +356,14 @@ const visualizer = {
     </code>
   </div>
   
-  <!-- CodeMirror Scripts with SRI integrity hashes -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"
-          integrity="sha512-xwrAU5yhWwdTvvmMNheFn9IyuDC11+Z9v5ovUHZ5+MiGjKBsjYjuBCaI1+BUVK5c3CFGPzVnJjfBDKqKwJiwHg=="
-          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"
-          integrity="sha512-oM64gU04+5vz9BqNzQsq3rB7D7TeI02EbLxOx7DyKmNGsDTVRogrWOBy4vGdm+xSbP9UQTgbk3MrKfHENFf44A=="
-          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/css/css.min.js"
-          integrity="sha512-xE65X7oQped8tPE0AB7UDnHobyT8wZjTRALNWJFi0DtWWCdDlSZI4M77vL0Yir9xzh1mI/pB4vy7yXs3+2c9zA=="
-          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/markdown/markdown.min.js"
-          integrity="sha512-VWpL2SJy9c4eqBEHqJMKlw5cvo4yJVCE0NmFjP0JVy4gXJXQQmJn1TXt51sW8J2sxBUzWKkqVOIV/8Gq0ZgX0A=="
-          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/htmlmixed/htmlmixed.min.js"
-          integrity="sha512-ZWc7w5Uo+BfEJwPiBTVKJeOhB6eUd/xJ1kxheLT6A/DJiV9HfoG8H0Q+KdE5PsGgd1E8q1TZXeqDGkBv3h+MCA=="
-          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/xml/xml.min.js"
-          integrity="sha512-LarNmzVokUmcA7aUDtqZ6oTS+YXmUKzpGdm8DxC46A6AHu+PQiYCUlwEGWidjVYMo/QXZMFMIadZtrkfApYp6g=="
-          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/scroll/simplescrollbars.min.js"
-          integrity="sha512-vZJo7+5VX1shXXn7HZW7TrAE6RpUzlcg8HZiKPZf/+RmQdR/rEk9gVeEKpZWc6qIqNPMd8T3CxmEh9KpLsD4A=="
-          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <!-- CodeMirror Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/mode/css/css.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/mode/markdown/markdown.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/mode/htmlmixed/htmlmixed.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/mode/xml/xml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/addon/scroll/simplescrollbars.min.js"></script>
   
   <script src="script.js"></script>
 </body>

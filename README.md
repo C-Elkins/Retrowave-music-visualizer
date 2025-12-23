@@ -15,7 +15,24 @@
 
 *Experience music like it's 1985*
 
+[![Version](https://img.shields.io/badge/version-2.0-ff2d92)](https://github.com/C-Elkins/Retrowave-music-visualizer)
+[![License](https://img.shields.io/badge/license-MIT-6df7ff)](LICENSE)
+
 </div>
+
+---
+
+## ✨ What's New in v2.0
+
+- **🎨 Two New Visualizations** – Waveform 3D & Spectrum Analyzer
+- **🌈 Five Color Themes** – Sunset, Night, Neon, Miami & Cyber
+- **🎚️ Audio Presets** – Bass Boost, Vocal, Electronic, Chill
+- **📊 Live VU Meter** – Real-time audio level display
+- **⏱️ Progress Bar** – Seek through your tracks
+- **📁 Drag & Drop Playlist** – Drop multiple files at once
+- **💾 Settings Persistence** – Your preferences are saved
+- **🚀 Loading Screen** – Smooth startup experience
+- **⌨️ More Keyboard Shortcuts** – Full keyboard control
 
 ---
 
@@ -27,12 +44,15 @@ Drop a track, stream some synthwave radio, or capture your system audio — then
 
 ### ✨ Why RetroWave?
 
-- **Four Visual Modes** – Spectrum Rings, Particle Waves, Retrowave Grid, Neon Tunnel
-- **Three Themes** – Sunset Horizon, Night Drive, Neon City
+- **Six Visual Modes** – Spectrum Rings, Particle Waves, Retrowave Grid, Neon Tunnel, Waveform 3D, Spectrum Analyzer
+- **Five Themes** – Sunset Horizon, Night Drive, Neon City, Miami Vice, Cyberpunk
 - **80s CRT Effects** – Toggle authentic scanlines, phosphor glow, and screen flicker
 - **Live Radio** – Stream from [Nightride.fm](https://nightride.fm) (24/7 synthwave!)
-- **Code & Create** – Built-in code editor for live sessions *(there's more to it than meets the eye...)*
+- **Audio Presets** – Optimize visuals for different music styles
+- **Drag & Drop** – Drop multiple audio files for automatic playlist
+- **Code & Create** – Built-in code editor with hidden Easter egg
 - **YouTube Dock** – Capture tab audio with one click
+- **Settings Save** – Your preferences persist between sessions
 
 ---
 
@@ -55,35 +75,45 @@ Drop `index.html` in your browser. That's it. No build, no dependencies, no npm 
 ## 🎨 Features
 
 ### 🎵 Audio Sources
-- **Upload** – Drag & drop any audio file
+- **Upload** – Drag & drop any audio file (supports playlists!)
 - **📻 Radio** – Stream Nightride FM, Chillsynth, or Datawave
 - **🎤 Mic** – Capture microphone input
 - **🖥️ Tab** – Visualize YouTube, Spotify, or any browser tab
 - **YouTube Dock** – Built-in player with one-click capture
 
 ### 🌈 Visual Modes
-Press **1-4** to switch modes:
+Press **1-6** to switch modes:
 - **1** – Spectrum Rings (radial energy beams)
 - **2** – Particle Waves (drifting particles + oscilloscope)
 - **3** – Retrowave Grid (synth sun, palms, neon trails)
 - **4** – Neon Tunnel (3D tunnel with audio-reactive depth)
-- **5** – ??? *(Try it and see...)* 💻
+- **5** – Waveform 3D (NEW! 3D perspective waveforms)
+- **6** – Spectrum Analyzer (NEW! Classic EQ-style bars)
+- **7** – ??? *(Try it and see...)* 💻
 
 ### 🎨 Themes
-- **Sunset** – Warm pinks, oranges, purples
-- **Night** – Cool blues, cyans, deep purples
-- **Neon** – Hot pinks, electric blues, vivid magentas
+Press **T** to cycle:
+- **🌅 Sunset** – Warm pinks, oranges, purples
+- **🌙 Night** – Cool blues, cyans, deep purples
+- **💜 Neon** – Hot pinks, electric blues, vivid magentas
+- **🌴 Miami** – Pink pastels, turquoise, tropical vibes
+- **🤖 Cyber** – Green, blue, red accents
+
+### 🎚️ Audio Presets
+- **Default** – Balanced for all music
+- **Bass Boost** – Emphasized low frequencies
+- **Vocal** – Focused on mid-range frequencies
+- **Electronic** – High reactivity for EDM
+- **Chill** – Smooth, subtle movements
 
 ### 📺 CRT Effects
 Toggle the **CRT button** for authentic 80s monitor vibes:
-- Horizontal scanlines (subtle, not overwhelming)
+- Horizontal scanlines
 - Film grain texture
 - Screen flicker animation
 - Phosphor glow
-- Chromatic aberration (RGB separation)
+- Chromatic aberration
 - Rolling scanline effect
-
-**Pro Tip:** CRT effects are optimized for 60fps — you'll want to keep them ON.
 
 ---
 
@@ -91,12 +121,16 @@ Toggle the **CRT button** for authentic 80s monitor vibes:
 
 | Key | Action |
 |-----|--------|
-| **1-4** | Switch visualization modes |
-| **5** | Code editor *(where the real fun begins...)* |
+| **1-6** | Switch visualization modes |
+| **7** | Code editor *(Easter egg inside!)* |
+| **T** | Cycle themes |
+| **R** | Toggle radio |
 | **F** | Fullscreen |
 | **M** | Mute |
 | **G** | Grid overlay toggle |
 | **Space** | Play/Pause |
+| **←/→** | Seek -/+ 10 seconds |
+| **↑/↓** | Volume up/down |
 
 ---
 
